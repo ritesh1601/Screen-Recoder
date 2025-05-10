@@ -1,12 +1,10 @@
 import React from 'react'
-
+import Header from "@/components/Header"
 const Page = () => {
   return (
-    <div>
-      <h1 className="underline text-2xl font-bold text-center font-karla">
-        Welcome
-      </h1>
-    </div>
+    <main className="wrapper page">
+        <Header title="All Videos" subHeader="Public Library"/>
+    </main>
   )
 }
 
