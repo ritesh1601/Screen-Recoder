@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://Ritesh-Saini-s-workspace-kong73.eu-central-1.xata.sh/db/Ritesh_ScreenShare",
+  "codegen": {
+    "output": "src/xata.ts"
+  }
+}
