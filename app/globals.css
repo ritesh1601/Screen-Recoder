@@ -13,6 +13,7 @@
 }
 
 @theme {
+  --color-pink-200: #ff69aa; /* Add to your @theme block */
   --color-blue-100: #2c325d;
   --color-light-100: #fff8fb;
   --color-dark-100: #212121;

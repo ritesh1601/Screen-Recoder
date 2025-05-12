@@ -13,17 +13,6 @@ const Page = () => {
                 {dummyCards.map((card) => (
                     <VideoCard key={card.id} {...card }/>
                 ))}
-                <VideoCard
-                    id="1"
-                    title="Sample Video Card"
-                    thumbnail="/assets/samples/thumbnail (1).png"
-                    createdAt={DateToday}
-                    userImage="/assets/images/dummy.jpg"
-                    userName="Ritesh"
-                    views={11}
-                    visibility="public"
-                    duration={100}
-                />
             </div>
         </main>
     );
