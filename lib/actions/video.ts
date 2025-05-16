@@ -1,16 +1,17 @@
 "use server"
 
-import {apiFetch, getEnv, withErrorHandling} from "@/lib/utils";
+import {apiFetch, doesTitleMatch, getEnv, withErrorHandling ,getOrderByClause} from "@/lib/utils";
 import {auth} from "@/lib/auth";
 import {headers} from "next/headers";
 import {BUNNY} from "@/constants";
 import {db} from "@/drizzle/db";
-import {videos} from "@/drizzle/schema";
+import {user, videos} from "@/drizzle/schema";
 import {revalidatePath} from "next/cache"
 import aj from "@/lib/arcjet";
 import {fixedWindow} from "arcjet";
-import {acceptWorkspaceMemberInvite} from "@xata.io/client";
 import {request} from "@arcjet/next";
+import {and, eq, or, sql} from "drizzle-orm";
+
 
 const VIDEO_STREAM_BASE_URL=BUNNY.STREAM_BASE_URL;
 const THUMBNAIL_STORAGE_BASE_URL=BUNNY.STORAGE_BASE_URL;
@@ -52,6 +53,18 @@ const ValidateWithArcjet=async (fingerprint:string)=>{
     if(decision.isDenied()){
         throw new Error('Rate Limit Exceedeed');
     }
+}
+
+
+// @ts-ignore
+const buildVideoWithUserQuery=()=>{
+    return db
+        .select({
+            video:videos,
+            user:{id:user.id , name : user.name ,image:user.image}
+        })
+        .from(videos)
+        .leftJoin(user,eq(videos.userId, user.id))
 }
 
 //Server Action
@@ -116,3 +129,56 @@ export const saveVideoDetails=withErrorHandling(async (videoDetails:VideoDetails
         videoId:videoDetails.videoId
     }
 })
+
+
+
+//searchQuery=test&pageNumber=2
+export const getAllVideos = withErrorHandling(
+    async (
+        searchQuery: string = '',
+        sortFilter?: string,
+        pageNumber: number = 1,
+        pageSize: number = 8
+    ) => {
+        const session = await auth.api.getSession({ headers: await headers() });
+        const currentUserId = session?.user?.id;
+
+        const canSeeTheVideos = or(
+            eq(videos.visibility, 'public'),
+            eq(videos.userId, currentUserId)
+        );
+
+        const whereCondition = searchQuery.trim()
+            ? and(
+                canSeeTheVideos,
+                doesTitleMatch(videos, searchQuery)
+            )
+            : canSeeTheVideos;
+
+        const [{ totalCount }] = await db
+            .select({ totalCount: sql<number>`count(*)` })
+            .from(videos)
+            .where(whereCondition);
+
+        const totalVideos = Number(totalCount || 0);
+        const totalPages = Math.ceil(totalVideos / pageSize);
+
+        const videoRecords = await buildVideoWithUserQuery()
+            .where(whereCondition)
+            .orderBy(
+                sortFilter ? getOrderByClause(sortFilter) : sql`${videos.createdAt}`
+            )
+            .limit(pageSize)
+            .offset((pageNumber - 1) * pageSize);
+
+        return {
+            videos: videoRecords,
+            pagination: {
+                currentPage: pageNumber,
+                totalPages,
+                totalVideos,
+                pageSize
+            }
+        };
+    }
+);
