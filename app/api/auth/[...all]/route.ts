@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { ArcjetDecision, slidingWindow, validateEmail } from "arcjet";
 import aj from "@/lib/arcjet";
 import { NextRequest } from "next/server";
-import ip from "arcjet";
+// import ip from "arcjet";
 
 // Email Validation
 const emailValidation = aj.withRule(
@@ -22,7 +22,13 @@ const rateLimit = aj.withRule(
 
 const protectedAuth = async (req: NextRequest): Promise<ArcjetDecision> => {
     const session = await auth.api.getSession({ headers: req.headers });
-    let userId: string = session?.user?.id || ip(req) || '127.0.0.1';
+    let userId: string;
+    try {
+        userId = session?.user?.id || aj.ip(req) || '127.0.0.1';
+    } catch {
+        userId = session?.user?.id || '127.0.0.1';
+    }
+
 
     if (req.nextUrl.pathname.startsWith('/api/auth/Sign-In')) {
         const body = await req.clone().json();
