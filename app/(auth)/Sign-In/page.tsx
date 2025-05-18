@@ -26,14 +26,14 @@ const Page = () => {
                             ))}
                         </figure>
                         <p>
-                            SnapCast makes screen recording easy. From quick walkthroughs to
+                            ScreenShare makes screen recording easy. From quick walk throughs to
                             full presentations, it&apos;s fast, smooth, and shareable in seconds
                         </p>
                         <article>
-                            <Image src="/assets/images/jason.png" alt="json" width={64} height={64} className="rounded-full"/>
+                            <Image src="/assets/images/myImage.jpg" alt="json" width={64} height={64} className="rounded-full aspect-auto" />
                             <div>
-                                <h2>Mark Hamsworth</h2>
-                                <p>Product designer at JPL , California</p>
+                                <h2>Ritesh Saini</h2>
+                                <p>Web Developer at JPL , California</p>
                             </div>
                         </article>
                     </section>
