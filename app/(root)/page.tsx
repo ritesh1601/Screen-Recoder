@@ -24,8 +24,8 @@ const Page = async ({searchParams}:SearchParams) => {
                             key={video.id}
                             {...video}
                             thumbnail={video.thumbnailUrl}
-                            userImage={user?.image || ''}
-                            userName={user?.name || 'Guest'}
+                            userImg={user?.image || ''}
+                            username={user?.name || 'Guest'}
                         />
                     ))}
                 </section>

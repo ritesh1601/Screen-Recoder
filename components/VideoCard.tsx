@@ -3,25 +3,13 @@
 import Link from "next/link";
 import Image from "next/image";
 
-declare interface VideoCardProps {
-    id: string;
-    title: string;
-    thumbnail: string;
-    createdAt: Date;
-    userImage: string;
-    userName: string;
-    views: number;
-    visibility: string;
-    duration: number | null;
-}
-
 const VideoCard = ({
                        id,
                        title,
                        thumbnail,
                        createdAt,
-                       userImage,
-                       userName,
+                       userImg,
+                       username,
                        views,
                        visibility,
                        duration,
@@ -39,14 +27,14 @@ const VideoCard = ({
                 <div>
                     <figure>
                         <Image
-                            src={userImage || `/assets/images/dummy.jpg`}
+                            src={userImg || `/assets/images/dummy.jpg`}
                             alt="avatar"
                             width={32}
                             height={32}
                             className="rounded-full aspect-square"
                         />
                         <figcaption>
-                            <h3>{userName}</h3>
+                            <h3>{username}</h3>
                             <p>{visibility}</p>
                         </figcaption>
                     </figure>
