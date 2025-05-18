@@ -147,23 +147,34 @@ export const generatePagination = (currentPage: number, totalPages: number) => {
 export const getMediaStreams = async (
     withMic: boolean
 ): Promise<MediaStreams> => {
-    const displayStream = await navigator.mediaDevices.getDisplayMedia({
-        video: DEFAULT_VIDEO_CONFIG,
-        audio: true,
-    });
-
-    const hasDisplayAudio = displayStream.getAudioTracks().length > 0;
+    let displayStream: MediaStream;
     let micStream: MediaStream | null = null;
+    let hasDisplayAudio = false;
+
+    try {
+        displayStream = await navigator.mediaDevices.getDisplayMedia({
+            video: DEFAULT_VIDEO_CONFIG,
+            audio: true,
+        });
+        hasDisplayAudio = displayStream.getAudioTracks().length > 0;
+    } catch (err) {
+        console.error("Error accessing display media:", err);
+        throw new Error("Screen recording permission denied or not supported.");
+    }
 
     if (withMic) {
-        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        micStream
-            .getAudioTracks()
-            .forEach((track: MediaStreamTrack) => (track.enabled = true));
+        try {
+            micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            micStream.getAudioTracks().forEach((track) => (track.enabled = true));
+        } catch (err) {
+            console.warn("Microphone access failed:", err);
+            micStream = null; // proceed without mic instead of crashing
+        }
     }
 
     return { displayStream, micStream, hasDisplayAudio };
 };
+
 
 export const createAudioMixer = (
     ctx: AudioContext,
