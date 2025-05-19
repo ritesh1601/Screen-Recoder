@@ -1,6 +1,5 @@
 import React from 'react'
 import Header from "@/components/Header";
-import {dummyCards} from "@/constants";
 import VideoCard from "@/components/VideoCard";
 import {getAllVideosByUser} from "@/lib/actions/video";
 import {redirect} from "next/navigation";
@@ -20,13 +19,17 @@ const Page =async ({params,searchParams}:ParamsWithSearch) => {
             {/*</section>*/}
             {videos?.length>0?(
                 <section className="video-grid">
-                    {videos.map(({video,user})=>(
+                    {videos.map(({video, user}) => (
                         <VideoCard
                             key={video.id}
-                            {...video}
-                            thumbnail={video.thumbnailUrl}
-                            userImage={user?.image || ''}
-                            userName={user?.name || 'Guest'}
+                            id={video.id}
+                            title={video.title}
+                            thumbnailUrl={video.thumbnailUrl}
+                            duration={video.duration}
+                            createdAt={video.createdAt}
+                            views={video.views}
+                            username={user?.name || 'Guest'}
+                            userImg={user?.image || '/assets/images/dummy.jpg'}
                         />
                     ))}
                 </section>

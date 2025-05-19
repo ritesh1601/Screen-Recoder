@@ -10,7 +10,7 @@ import {revalidatePath} from "next/cache"
 import aj from "@/lib/arcjet";
 import {fixedWindow} from "arcjet";
 import {request} from "@arcjet/next";
-import {and, desc, eq, ilike, or, sql} from "drizzle-orm";
+import {and, desc, eq, ilike, sql} from "drizzle-orm";
 
 
 const VIDEO_STREAM_BASE_URL=BUNNY.STREAM_BASE_URL;
@@ -56,7 +56,7 @@ const ValidateWithArcjet=async (fingerprint:string)=>{
 }
 
 
-// @ts-ignore
+
 const buildVideoWithUserQuery=()=>{
     return db
         .select({
@@ -140,20 +140,12 @@ export const getAllVideos = withErrorHandling(
         pageNumber: number = 1,
         pageSize: number = 8
     ) => {
-        const session = await auth.api.getSession({ headers: await headers() });
-        const currentUserId = session?.user?.id;
-
-        const canSeeTheVideos = or(
-            eq(videos.visibility, 'public'),
-            eq(videos.userId, currentUserId)
-        );
-
         const whereCondition = searchQuery.trim()
             ? and(
-                canSeeTheVideos,
+                eq(videos.visibility, 'public'),
                 doesTitleMatch(videos, searchQuery)
             )
-            : canSeeTheVideos;
+            : eq(videos.visibility, 'public');
 
         const [{ totalCount }] = await db
             .select({ totalCount: sql<number>`count(*)` })
@@ -227,3 +219,87 @@ export const getAllVideosByUser = withErrorHandling(
         return { user: userInfo, videos: userVideos, count: userVideos.length };
     }
 );
+
+export const deleteVideoFromBunny = withErrorHandling(async (videoId: string) => {
+    // Authenticate user
+    await getSessionUserID();
+
+    // Delete from Bunny CDN
+    await apiFetch(
+        `${VIDEO_STREAM_BASE_URL}/${BUNNY_LIBRARY_ID}/videos/${videoId}`,
+        {
+            method: 'DELETE',
+            bunnyType: 'stream',
+            expectJson: false,
+        }
+    );
+
+    // Delete from local database
+    await db.delete(videos).where(eq(videos.videoId, videoId));
+
+    // Revalidate homepage
+    revalidatePaths(['/']);
+
+    return { success: true };
+});
+
+export const updateVideoVisibility = withErrorHandling(
+    async (videoId: string, visibility: 'public' | 'private') => {
+        const session = await auth.api.getSession({ headers: await headers() });
+        const currentUserId = session?.user?.id;
+
+        if (!currentUserId) {
+            throw new Error("Unauthenticated");
+        }
+
+        const [video] = await db
+            .select()
+            .from(videos)
+            .where(eq(videos.id, videoId));
+
+        if (!video) {
+            throw new Error("Video not found");
+        }
+
+        if (video.userId !== currentUserId) {
+            throw new Error("Unauthorized");
+        }
+
+        await db
+            .update(videos)
+            .set({ visibility: visibility as 'public' | 'private' })
+            .where(eq(videos.id, videoId));
+
+        revalidatePath('/');
+        return { success: true };
+    }
+);
+
+export const incrementVideoViews = withErrorHandling(async (videoId: string) => {
+    const session = await auth.api.getSession({ headers: await headers() });
+    const currentUserId = session?.user?.id;
+
+    if (!currentUserId) {
+        throw new Error("Unauthenticated");
+    }
+
+    // Get the video to check ownership
+    const [video] = await db
+        .select()
+        .from(videos)
+        .where(eq(videos.id, videoId));
+
+    if (!video) {
+        throw new Error("Video not found");
+    }
+
+    // Only increment if the viewer is not the owner
+    if (video.userId !== currentUserId) {
+        await db
+            .update(videos)
+            .set({ views: sql`${videos.views} + 1` })
+            .where(eq(videos.id, videoId));
+    }
+
+    return { success: true };
+});

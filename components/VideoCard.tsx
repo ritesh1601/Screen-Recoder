@@ -1,72 +1,79 @@
 "use client"
 
-import Link from "next/link";
+import { incrementVideoViews } from "@/lib/actions/video";
 import Image from "next/image";
+import Link from "next/link";
 
-const VideoCard = ({
-                       id,
-                       title,
-                       thumbnail,
-                       createdAt,
-                       userImg,
-                       username,
-                       views,
-                       visibility,
-                       duration,
-                   }: VideoCardProps) => {
+interface VideoCardProps {
+    id: string;
+    title: string;
+    thumbnailUrl: string;
+    duration: number | null;
+    createdAt: Date;
+    views: number;
+    username: string;
+    userImg: string;
+}
+
+export default function VideoCard({
+    id,
+    title,
+    thumbnailUrl,
+    duration,
+    createdAt,
+    views,
+    username,
+    userImg,
+}: VideoCardProps) {
+    const handleClick = async () => {
+        try {
+            await incrementVideoViews(id);
+        } catch (error) {
+            console.error("Error incrementing view count:", error);
+        }
+    };
+
+    // Format date in a consistent way
+    const formattedDate = new Date(createdAt).toISOString().split('T')[0];
+
     return (
-        <Link href={`/video/${id}`} className="video-card">
-            <Image
-                src={thumbnail}
-                alt={`${title} Thumbnail`}
-                width={290}
-                height={160}
-                className="thumbnail"
-            />
-            <article>
+        <Link 
+            href={`/video/${id}`}
+            className="group cursor-pointer"
+            onClick={handleClick}
+        >
+            <div className="relative aspect-video overflow-hidden rounded-lg">
+                <Image
+                    src={thumbnailUrl}
+                    alt={title}
+                    width={290}
+                    height={160}
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
+                {duration && (
+                    <div className="absolute bottom-2 right-2 rounded bg-black/80 px-1.5 py-0.5 text-xs text-white">
+                        {Math.floor(duration / 60)}:{(duration % 60).toString().padStart(2, '0')}
+                    </div>
+                )}
+            </div>
+            <div className="mt-3 flex gap-3">
+                <Image
+                    src={userImg}
+                    alt={username}
+                    width={36}
+                    height={36}
+                    className="h-9 w-9 rounded-full"
+                />
                 <div>
-                    <figure>
-                        <Image
-                            src={userImg || `/assets/images/dummy.jpg`}
-                            alt="avatar"
-                            width={32}
-                            height={32}
-                            className="rounded-full aspect-square"
-                        />
-                        <figcaption>
-                            <h3>{username}</h3>
-                            <p>{visibility}</p>
-                        </figcaption>
-                    </figure>
-                    <aside>
-                        <Image
-                            src="/assets/icons/eye.svg"
-                            alt="views"
-                            width={16}
-                            height={16}
-                        />
-                        <span>{views}</span>
-                    </aside>
+                    <h3 className="font-medium line-clamp-2">{title}</h3>
+                    <p className="mt-1 text-sm text-gray-500">{username}</p>
+                    <div className="mt-1 flex items-center gap-2 text-sm text-gray-500">
+                        <span>{views.toLocaleString()} views</span>
+                        <span>•</span>
+                        <span>{formattedDate}</span>
+                    </div>
                 </div>
-                <h2>
-                    {title} -{" "}
-                    {createdAt.toLocaleDateString("en-IN", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                    })}
-                </h2>
-            </article>
-            <button onClick={() => {}} className="copy-btn">
-                <Image src="/assets/icons/link.svg" alt="copy" width={20} height={20} />
-            </button>
-            {duration && (
-                <div className="duration">
-                    {Math.ceil(duration / 60)} min
-                </div>
-            )}
+            </div>
         </Link>
     );
-};
-
-export default VideoCard;
+}

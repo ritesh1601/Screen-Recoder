@@ -1,11 +1,29 @@
-import React from 'react'
+"use client"
+
+import React, { useState, useEffect } from 'react'
 import DropdownList from "@/components/DropdownList";
 import Image from "next/image";
 import Link from "next/link";
-import {ICONS} from "@/constants";
 import RecordScreen from "@/components/RecordScreen";
-// @ts-ignore
-const Header = ({subHeader,title,userImg}:SharedHeaderProps) => {
+import { useRouter, useSearchParams } from "next/navigation";
+import { useDebounce } from "@/lib/hooks/useDebounce";
+
+const Header = ({ subHeader, title, userImg }: SharedHeaderProps) => {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const [searchQuery, setSearchQuery] = useState(searchParams.get('query') || '');
+    const debouncedSearch = useDebounce(searchQuery, 500);
+
+    useEffect(() => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (debouncedSearch) {
+            params.set('query', debouncedSearch);
+        } else {
+            params.delete('query');
+        }
+        router.push(`?${params.toString()}`);
+    }, [debouncedSearch, router, searchParams]);
+
     return (
         <header className="header">
             <section className="header-container">
@@ -37,7 +55,9 @@ const Header = ({subHeader,title,userImg}:SharedHeaderProps) => {
                 <div className="search">
                     <input
                         type="text"
-                        placeholder="Search for videos ,tags , folders ... "
+                        placeholder="Search for videos, tags, folders..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                     />
                     <Image src="/assets/icons/search.svg" alt="search" width={16} height={16}/>
                 </div>

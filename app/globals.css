@@ -671,4 +671,28 @@
       }
     }
   }
+  /* toast */
+  .toast {
+    @apply fixed top-5 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-6 py-3 rounded-md shadow-lg z-[1000] flex flex-col items-center justify-center;
+  }
+
+  .toast-buttons {
+    @apply flex gap-2.5 mt-2.5;
+  }
+
+  .toast button {
+    @apply bg-pink-100 text-white border-none py-1.5 px-2.5 rounded-md cursor-pointer font-bold;
+  }
+
+  .toast button:hover {
+    @apply bg-pink-200;
+  }
+
+  .toast .reject-btn {
+    @apply bg-gray-100;
+  }
+
+  .toast .reject-btn:hover {
+    @apply bg-gray-200;
+  }
 }
