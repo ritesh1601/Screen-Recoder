@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
         remotePatterns: [
             {
                 protocol: 'https',
-                hostname: 'ritesh-storyshare.b-cdn.net',
+                hostname: 'Ritesh-StoryShare.b-cdn.net',
                 pathname: '/**',
             },
             {
