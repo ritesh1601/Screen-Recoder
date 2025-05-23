@@ -66,6 +66,6 @@ NEXTAUTH_SECRET=your-random-secret
 NEXTAUTH_URL=http://localhost:3000
 XATA_API_KEY=your-xata-api-key
 ```
-**npm run dev**
+### 3. npm run dev
 
 
