@@ -1,36 +1,71 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎥 Screen Recorder aka ScreenShare
 
-## Getting Started
+**Screen Recorder** is a modern, full-stack web application that allows users to **record their screens**, **upload videos**, and **share them publicly or privately**. Built using **Next.js**, this app emphasizes seamless user experience, fast performance, and intuitive UI. Whether you're creating tutorials, walkthroughs, or just want to capture a moment on your screen, ScreenShare makes the process simple and efficient.
 
-First, run the development server:
+---
 
+## 🌐 Live Demo
+
+Check out the live version of the app here:
+
+🔗 **LIVE LINK**: [https://screen-recoder-olive.vercel.app/](https://screen-recoder-olive.vercel.app/)
+
+📁 **GitHub Repository**: [https://github.com/ritesh1601/Screen-Recoder](https://github.com/ritesh1601/Screen-Recoder)
+
+---
+
+## 🚀 Features
+
+- 🎬 **Screen Recording**: Record your screen directly from the browser using native APIs.
+- 📤 **Video Uploads**: Upload recorded videos to a cloud database via Xata.
+- 📺 **Video Playback**: Watch videos with a custom player that supports full-screen and seek.
+- 🧑‍💼 **User Authentication**: Secure login/logout with NextAuth (OAuth-ready).
+- 🔐 **Personal Profiles**: View your uploaded videos and recordings in your own dashboard.
+- 🌍 **Public Sharing**: Each video has a unique shareable URL for easy access and sharing.
+- ⚙️ **Responsive Design**: Optimized for desktop, tablet, and mobile viewing.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer         | Tech Stack                            |
+| ------------- | ------------------------------------- |
+| Frontend      | Next.js, TypeScript, Tailwind CSS     |
+| Backend       | Next.js API Routes, Server Actions    |
+| Authentication| NextAuth (Session-based)              |
+| Database      | Xata (via Drizzle ORM)                |
+| UI Components | Custom-built + React-based Components |
+| Hosting       | Vercel                                |
+
+---
+
+---
+
+## 🧩 Key Components
+
+- `RecordScreen.tsx` – Handles screen recording functionality.
+- `VideoCard.tsx` – Displays a thumbnail and link to a video.
+- `Navbar.tsx` – Persistent navigation bar with login/logout links.
+- `useScreenRecording.ts` – Custom React hook for controlling recording logic.
+- `VideoPlayer.tsx` – A reusable video playback component.
+- `upload/page.tsx` – Page for uploading videos and recording content.
+
+---
+
+## ⚙️ Setup and Installation
+
+### 1. Clone the Repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/ritesh1601/Screen-Recoder.git
+cd Screen-Recoder
+npm install
 ```
+### 2. Configure Environment Variables
+```bash
+NEXTAUTH_SECRET=your-random-secret
+NEXTAUTH_URL=http://localhost:3000
+XATA_API_KEY=your-xata-api-key
+```
+**npm run dev**
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
